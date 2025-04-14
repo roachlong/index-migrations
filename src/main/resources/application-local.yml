@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:26257/defaultdb?currentSchema=public
+    username: root
+  jpa:
+    database: postgresql
+    defer-database-initialization: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        show_sql: true
+  liquibase:
+    user: root
+  sql:
+    init:
+      mode: always
