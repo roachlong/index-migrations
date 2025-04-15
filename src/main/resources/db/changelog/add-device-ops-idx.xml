@@ -1,50 +1,16 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
-    <changeSet id="create-index-and-wait" author="jleelong">
+    <changeSet id="create-index" author="jleelong">
         <!-- Create the index -->
         <sql>
             CREATE INDEX device_ops_idx ON public.device_operations (device_id);
         </sql>
+    </changeSet>
 
+    <changeSet id="wait-for-index" author="jleelong">
         <!-- Wait for the index creation job to complete -->
         <customChange class="com.cockroachdb.index_migrations.WaitForIndexCreation">
             <param name="indexName" value="device_ops_idx"/>
         </customChange>
-
-        <!-- Execute the shell script to wait for index creation -->
-        <!-- <executeCommand executable="bash">
-            <arg value="scripts/wait-for-index.sh"/>
-        </executeCommand> -->
-
-        <!-- Wait for the index creation job to complete -->
-        <!-- <sql splitStatements="false">
-            DO $$
-            DECLARE
-                job_id INT8;
-                job_status STRING;
-                start_time TIMESTAMP;
-            BEGIN
-                SELECT job_id INTO job_id
-                FROM [SHOW JOBS]
-                WHERE description LIKE 'CREATE INDEX device_ops_idx%'
-                ORDER BY created DESC
-                LIMIT 1;
-                
-                start_time := clock_timestamp();
-
-                LOOP
-                    SELECT status INTO job_status
-                    FROM [SHOW JOBS]
-                    WHERE job_id = job_id;
-                    EXIT WHEN job_status = 'succeeded';
-
-                    start_time := clock_timestamp();
-                    LOOP
-                        SELECT 1;
-                        EXIT WHEN clock_timestamp() - start_time > INTERVAL '10 seconds';
-                    END LOOP;
-                END LOOP;
-            END $$;
-        </sql> -->
     </changeSet>
 </databaseChangeLog>
